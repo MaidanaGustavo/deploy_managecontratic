@@ -1,9 +1,10 @@
 import { createContext, useContext, useState } from 'react'
+import clienteService from '../services/clienteService'
 
 const AuthContext = createContext(null)
 
-// Usuários mock para teste
-const mockUsers = [
+// Usuários admin mock para teste
+const mockAdminUsers = [
   {
     id: 1,
     email: 'admin@exemplo.com',
@@ -23,24 +24,46 @@ const mockUsers = [
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
 
-  const login = (email, password) => {
-    // Busca o usuário nos dados mock
-    const foundUser = mockUsers.find(
-      u => u.email === email && u.password === password
-    )
+  const login = async (email, password, isCliente = false) => {
+    if (isCliente) {
+      // Login de cliente - busca nos clientes cadastrados
+      try {
+        const clientes = await clienteService.listar()
+        const cliente = clientes.find(
+          c => c.email === email && c.senha === password
+        )
 
-    if (foundUser) {
-      // Remove a senha antes de armazenar
-      const { password: _, ...userWithoutPassword } = foundUser
-      setUser(userWithoutPassword)
+        if (cliente) {
+          const clienteUser = {
+            id: cliente.id,
+            email: cliente.email,
+            name: cliente.razaoSocial,
+            role: 'cliente',
+            clienteId: cliente.id,
+            cnpj: cliente.cnpj
+          }
+          setUser(clienteUser)
+          localStorage.setItem('user', JSON.stringify(clienteUser))
+          return { success: true }
+        }
+        return { success: false, error: 'Email ou senha inválidos' }
+      } catch (error) {
+        return { success: false, error: 'Erro ao fazer login' }
+      }
+    } else {
+      // Login de admin/usuário - busca nos dados mock
+      const foundUser = mockAdminUsers.find(
+        u => u.email === email && u.password === password
+      )
 
-      // Armazena no localStorage para persistência
-      localStorage.setItem('user', JSON.stringify(userWithoutPassword))
-
-      return { success: true }
+      if (foundUser) {
+        const { password: _, ...userWithoutPassword } = foundUser
+        setUser(userWithoutPassword)
+        localStorage.setItem('user', JSON.stringify(userWithoutPassword))
+        return { success: true }
+      }
+      return { success: false, error: 'Email ou senha inválidos' }
     }
-
-    return { success: false, error: 'Email ou senha inválidos' }
   }
 
   const logout = () => {

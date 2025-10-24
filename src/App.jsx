@@ -1,7 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import LoginPage from './components/LoginPage'
+import LoginCliente from './components/LoginCliente'
 import Dashboard from './components/Dashboard'
+import ClienteDashboard from './components/ClienteDashboard'
+import ClienteContratoDetalhes from './components/ClienteContratoDetalhes'
 import CadastrarCliente from './components/CadastrarCliente'
 import CadastrarContrato from './components/CadastrarContrato'
 import EditarContrato from './components/EditarContrato'
@@ -15,6 +18,27 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<LoginPage />} />
+
+          {/* Rotas do Cliente */}
+          <Route path="/cliente/login" element={<LoginCliente />} />
+          <Route
+            path="/cliente/dashboard"
+            element={
+              <ProtectedRoute>
+                <ClienteDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cliente/contrato/:id"
+            element={
+              <ProtectedRoute>
+                <ClienteContratoDetalhes />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Rotas do Admin */}
           <Route
             path="/dashboard"
             element={

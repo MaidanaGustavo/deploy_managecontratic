@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 
 function LoginPage() {
   const [email, setEmail] = useState('')
@@ -175,6 +175,29 @@ function LoginPage() {
               Cadastre-se
             </a>
           </p>
+        </div>
+
+        {/* Link para Portal do Cliente */}
+        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-blue-900">É um cliente?</p>
+                <p className="text-xs text-blue-700">Acesse o portal para visualizar seus contratos</p>
+              </div>
+            </div>
+            <Link
+              to="/cliente/login"
+              className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition"
+            >
+              Portal do Cliente
+            </Link>
+          </div>
         </div>
 
         {/* Footer */}

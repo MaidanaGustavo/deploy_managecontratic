@@ -3,14 +3,55 @@
 
 const STORAGE_KEY = 'contractic_clientes'
 
+// Dados mock para testes
+const MOCK_CLIENTES = [
+  {
+    id: 'mock-cliente-1',
+    razaoSocial: 'Tech Solutions Ltda',
+    cnpj: '12.345.678/0001-90',
+    email: 'contato@techsolutions.com',
+    senha: 'tech123',
+    telefone: '(67) 99999-1111',
+    endereco: 'Rua das Flores, 123 - Campo Grande/MS',
+    dataCadastro: new Date('2024-01-15').toISOString()
+  },
+  {
+    id: 'mock-cliente-2',
+    razaoSocial: 'Comercial Silva & Cia',
+    cnpj: '98.765.432/0001-10',
+    email: 'contato@comercialsilva.com',
+    senha: 'silva123',
+    telefone: '(67) 98888-2222',
+    endereco: 'Av. Principal, 456 - Campo Grande/MS',
+    dataCadastro: new Date('2024-02-20').toISOString()
+  },
+  {
+    id: 'mock-cliente-3',
+    razaoSocial: 'Empresa Demo Teste',
+    cnpj: '11.222.333/0001-44',
+    email: 'demo@empresa.com',
+    senha: 'demo123',
+    telefone: '(67) 97777-3333',
+    endereco: 'Rua Teste, 789 - Campo Grande/MS',
+    dataCadastro: new Date('2024-03-10').toISOString()
+  }
+]
+
 // Função auxiliar para obter clientes do localStorage
 const getClientesFromStorage = () => {
   try {
     const clientes = localStorage.getItem(STORAGE_KEY)
-    return clientes ? JSON.parse(clientes) : []
+    if (clientes) {
+      return JSON.parse(clientes)
+    }
+
+    // Se não houver clientes no storage, retorna os clientes mock
+    // e os salva no storage para facilitar o teste
+    saveClientesToStorage(MOCK_CLIENTES)
+    return MOCK_CLIENTES
   } catch (error) {
     console.error('Erro ao obter clientes:', error)
-    return []
+    return MOCK_CLIENTES // Retorna mock em caso de erro
   }
 }
 
