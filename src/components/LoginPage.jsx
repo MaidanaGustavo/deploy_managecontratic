@@ -12,17 +12,22 @@ function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
     setLoading(true)
 
-    const result = login(email, password)
+    try {
+      const result = await login(email, password)
 
-    if (result.success) {
-      navigate('/dashboard')
-    } else {
-      setError(result.error)
+      if (result.success) {
+        navigate('/dashboard')
+      } else {
+        setError(result.error)
+        setLoading(false)
+      }
+    } catch (err) {
+      setError('Erro ao fazer login. Tente novamente.')
       setLoading(false)
     }
   }
