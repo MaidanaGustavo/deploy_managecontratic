@@ -81,8 +81,6 @@ const ClienteSchema = new mongoose.Schema(
 )
 
 // Índices para melhorar performance de busca
-ClienteSchema.index({ cnpj: 1 })
-ClienteSchema.index({ email: 1 })
 ClienteSchema.index({ ativo: 1 })
 
 // Virtual populate para contratos
