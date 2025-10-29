@@ -1,0 +1,175 @@
+/* Tiptap Editor Styles */
+
+/* Table styling */
+.ProseMirror table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+
+.ProseMirror td,
+.ProseMirror th {
+  min-width: 1em;
+  border: 2px solid #d1d5db;
+  padding: 8px 12px;
+  vertical-align: top;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.ProseMirror th {
+  font-weight: bold;
+  text-align: left;
+  background-color: #f3f4f6;
+}
+
+.ProseMirror .selectedCell:after {
+  z-index: 2;
+  position: absolute;
+  content: "";
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(59, 130, 246, 0.15);
+  pointer-events: none;
+}
+
+.ProseMirror .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: -2px;
+  width: 4px;
+  background-color: #3b82f6;
+  pointer-events: none;
+}
+
+.ProseMirror.resize-cursor {
+  cursor: ew-resize;
+  cursor: col-resize;
+}
+
+/* Link styling */
+.ProseMirror a {
+  color: #2563eb;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.ProseMirror a:hover {
+  color: #1d4ed8;
+}
+
+/* Code styling */
+.ProseMirror code {
+  background-color: #f3f4f6;
+  color: #1f2937;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* Blockquote styling */
+.ProseMirror blockquote {
+  padding-left: 1rem;
+  border-left: 4px solid #d1d5db;
+  color: #6b7280;
+  font-style: italic;
+  margin: 1rem 0;
+}
+
+/* Horizontal rule styling */
+.ProseMirror hr {
+  border: none;
+  border-top: 2px solid #d1d5db;
+  margin: 2rem 0;
+}
+
+/* List styling */
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 1.5rem;
+  margin: 0.75rem 0;
+}
+
+.ProseMirror li {
+  margin: 0.25rem 0;
+}
+
+/* Heading styling */
+.ProseMirror h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 1rem 0 0.5rem;
+}
+
+.ProseMirror h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0.875rem 0 0.5rem;
+}
+
+.ProseMirror h3 {
+  font-size: 1.25em;
+  font-weight: bold;
+  margin: 0.75rem 0 0.5rem;
+}
+
+/* Paragraph styling */
+.ProseMirror p {
+  margin: 0.5rem 0;
+  line-height: 1.6;
+}
+
+/* Empty paragraph placeholder */
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: #9ca3af;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Focus styling */
+.ProseMirror:focus {
+  outline: none;
+}
+
+/* Selection styling */
+.ProseMirror ::selection {
+  background: rgba(59, 130, 246, 0.2);
+}
+
+/* Text alignment classes */
+.ProseMirror .text-left {
+  text-align: left;
+}
+
+.ProseMirror .text-center {
+  text-align: center;
+}
+
+.ProseMirror .text-right {
+  text-align: right;
+}
+
+.ProseMirror .text-justify {
+  text-align: justify;
+}
+
+/* Better spacing for editor content */
+.ProseMirror {
+  min-height: 400px;
+  padding: 1rem;
+}
+
+/* Mark/Highlight styling */
+.ProseMirror mark {
+  background-color: #fef3c7;
+  padding: 0.125rem 0;
+  border-radius: 0.125rem;
+}

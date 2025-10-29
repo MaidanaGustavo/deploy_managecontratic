@@ -48,7 +48,8 @@ function ClientesContratos() {
   }
 
   const getContratosPorCliente = (clienteId) => {
-    return contratos.filter(contrato => contrato.clienteId === clienteId)
+    if (!contratos || contratos.length === 0) return []
+    return contratos.filter(contrato => contrato.cliente?.id === clienteId)
   }
 
   const formatarData = (dataISO) => {
@@ -332,26 +333,7 @@ function ClientesContratos() {
                                           {statusInfo.label}
                                         </span>
                                       </div>
-                                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                                        <div>
-                                          <p className="text-xs text-gray-500">Tipo</p>
-                                          <p className="font-medium text-gray-900 capitalize">{contrato.tipo || 'N/A'}</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-xs text-gray-500">Valor</p>
-                                          <p className="font-medium text-gray-900">
-                                            {contrato.valor ? `R$ ${parseFloat(contrato.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'N/A'}
-                                          </p>
-                                        </div>
-                                        <div>
-                                          <p className="text-xs text-gray-500">Data Início</p>
-                                          <p className="font-medium text-gray-900">{formatarData(contrato.dataInicio)}</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-xs text-gray-500">Data Fim</p>
-                                          <p className="font-medium text-gray-900">{formatarData(contrato.dataFim)}</p>
-                                        </div>
-                                      </div>
+
                                       {contrato.descricao && (
                                         <p className="mt-2 text-sm text-gray-600">{contrato.descricao}</p>
                                       )}

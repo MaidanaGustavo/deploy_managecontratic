@@ -1,18 +1,22 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import clienteService from '../services/clienteService'
-import { maskCNPJ, unmaskCNPJ, isValidCNPJ } from '../utils/maskUtils'
+import { maskCNPJ, unmaskCNPJ, isValidCNPJ, maskTelefone } from '../utils/maskUtils'
 
 function CadastrarCliente() {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
     razaoSocial: '',
     cnpj: '',
-    nichoProduto: ''
+    email: '',
+    telefone: '',
+    endereco: ''
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [cnpjError, setCnpjError] = useState('')
+  const [senhaGerada, setSenhaGerada] = useState(null)
+  const [senhaCopied, setSenhaCopied] = useState(false)
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -27,6 +31,13 @@ function CadastrarCliente() {
 
       // Limpa erro ao digitar
       if (cnpjError) setCnpjError('')
+    } else if (name === 'telefone') {
+      // Aplica a máscara ao telefone
+      const maskedValue = maskTelefone(value)
+      setFormData(prev => ({
+        ...prev,
+        [name]: maskedValue
+      }))
     } else {
       setFormData(prev => ({
         ...prev,
@@ -52,6 +63,18 @@ function CadastrarCliente() {
       // Limpa erro ao colar
       if (cnpjError) setCnpjError('')
       if (error) setError('')
+    } else if (e.target.name === 'telefone') {
+      e.preventDefault()
+      const pastedText = e.clipboardData.getData('text')
+      const maskedValue = maskTelefone(pastedText)
+
+      setFormData(prev => ({
+        ...prev,
+        telefone: maskedValue
+      }))
+
+      // Limpa erro ao colar
+      if (error) setError('')
     }
   }
 
@@ -69,31 +92,46 @@ function CadastrarCliente() {
     setLoading(true)
 
     try {
-      // Prepara dados para salvar (sem máscara no CNPJ)
+      // Prepara dados para salvar (sem máscara no CNPJ e telefone)
       const clienteData = {
         razaoSocial: formData.razaoSocial.trim(),
         cnpj: unmaskCNPJ(formData.cnpj),
-        nichoProduto: formData.nichoProduto.trim()
+        email: formData.email.trim(),
+        telefone: formData.telefone.replace(/\D/g, ''), // Remove máscara do telefone
+        endereco: formData.endereco.trim()
       }
 
-      await clienteService.criar(clienteData)
+      const response = await clienteService.criar(clienteData)
 
-      // Redireciona para o dashboard após sucesso
-      navigate('/dashboard', {
-        state: {
-          message: 'Cliente cadastrado com sucesso!',
-          type: 'success'
-        }
-      })
+      // Captura a senha gerada pelo backend
+      if (response.senhaGerada) {
+        setSenhaGerada(response.senhaGerada)
+      }
     } catch (err) {
       setError(err.message || 'Erro ao cadastrar cliente')
-    } finally {
       setLoading(false)
     }
   }
 
   const handleCancel = () => {
     navigate('/dashboard')
+  }
+
+  const handleCloseModal = () => {
+    navigate('/dashboard', {
+      state: {
+        message: 'Cliente cadastrado com sucesso!',
+        type: 'success'
+      }
+    })
+  }
+
+  const handleCopySenha = () => {
+    if (senhaGerada) {
+      navigator.clipboard.writeText(senhaGerada)
+      setSenhaCopied(true)
+      setTimeout(() => setSenhaCopied(false), 2000)
+    }
   }
 
   return (
@@ -209,20 +247,56 @@ function CadastrarCliente() {
               )}
             </div>
 
-            {/* Nicho de Produto */}
+            {/* Email */}
             <div>
-              <label htmlFor="nichoProduto" className="block text-sm font-medium text-gray-700 mb-2">
-                Nicho de Produto *
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                Email *
               </label>
               <input
-                type="text"
-                id="nichoProduto"
-                name="nichoProduto"
-                value={formData.nichoProduto}
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                placeholder="Ex: Tecnologia, Alimentação, Saúde, etc."
+                placeholder="exemplo@empresa.com"
+              />
+              <p className="mt-1 text-sm text-gray-500">Email será usado para login do cliente. Uma senha padrão será gerada automaticamente.</p>
+            </div>
+
+            {/* Telefone */}
+            <div>
+              <label htmlFor="telefone" className="block text-sm font-medium text-gray-700 mb-2">
+                Telefone
+              </label>
+              <input
+                type="text"
+                id="telefone"
+                name="telefone"
+                value={formData.telefone}
+                onChange={handleChange}
+                onPaste={handlePaste}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                placeholder="(00) 00000-0000"
+                maxLength="15"
+              />
+              <p className="mt-1 text-sm text-gray-500">Formato: (00) 00000-0000</p>
+            </div>
+
+            {/* Endereço */}
+            <div>
+              <label htmlFor="endereco" className="block text-sm font-medium text-gray-700 mb-2">
+                Endereço
+              </label>
+              <textarea
+                id="endereco"
+                name="endereco"
+                value={formData.endereco}
+                onChange={handleChange}
+                rows="3"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                placeholder="Rua, número, bairro, cidade - Estado"
               />
             </div>
 
@@ -266,12 +340,90 @@ function CadastrarCliente() {
             <div>
               <h3 className="text-sm font-medium text-blue-800">Informação</h3>
               <p className="mt-1 text-sm text-blue-700">
-                Todos os campos marcados com * são obrigatórios. Certifique-se de preencher corretamente o CNPJ da empresa.
+                Campos obrigatórios (*): Razão Social, CNPJ e Email. Uma senha padrão será gerada automaticamente para o cliente.
               </p>
             </div>
           </div>
         </div>
       </main>
+
+      {/* Modal de Senha Gerada */}
+      {senhaGerada && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-center w-16 h-16 mx-auto bg-green-100 rounded-full">
+              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+
+            <h3 className="mt-4 text-xl font-semibold text-gray-900 text-center">
+              Cliente Cadastrado com Sucesso!
+            </h3>
+
+            <div className="mt-6 bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4">
+              <div className="flex items-start space-x-3">
+                <svg className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-yellow-800">Senha de Acesso Gerada</h4>
+                  <p className="mt-1 text-xs text-yellow-700">
+                    Anote ou copie esta senha. Ela será necessária para o cliente acessar o sistema.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 flex items-center justify-between bg-white rounded-lg p-3 border border-yellow-300">
+                <div className="flex items-center space-x-2 flex-1">
+                  <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <code className="text-lg font-mono font-bold text-gray-900">{senhaGerada}</code>
+                </div>
+                <button
+                  onClick={handleCopySenha}
+                  className="ml-2 px-3 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-sm font-medium flex items-center space-x-1"
+                >
+                  {senhaCopied ? (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Copiado!</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      <span>Copiar</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-6 bg-gray-50 rounded-lg p-4">
+              <p className="text-sm text-gray-700">
+                <strong>Email:</strong> {formData.email}
+              </p>
+              <p className="text-sm text-gray-700 mt-1">
+                <strong>Senha:</strong> {senhaGerada}
+              </p>
+            </div>
+
+            <div className="mt-6 flex justify-center">
+              <button
+                onClick={handleCloseModal}
+                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition duration-200 shadow-lg hover:shadow-xl"
+              >
+                Fechar e Voltar ao Dashboard
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
