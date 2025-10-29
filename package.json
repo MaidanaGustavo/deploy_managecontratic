@@ -8,6 +8,7 @@
     "dev:backend": "next dev -p 3001",
     "dev:all": "npm run dev:backend & npm run dev",
     "build": "vite build && next build",
+    "build:production": "npm install --omit=dev && npm run build",
     "build:frontend": "vite build",
     "build:backend": "next build",
     "start:backend": "next start -p 3001",
