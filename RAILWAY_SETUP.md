@@ -27,15 +27,17 @@ Railway MongoDB plugin automatically provides `DATABASE_URL` or `MONGO_URL`. If 
 DATABASE_URL=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>?retryWrites=true&w=majority
 ```
 
-### 2. API URL (Required for Production)
+### 2. API URL (Optional)
 
-Set this to use same-origin API calls:
+The frontend **automatically detects production mode** and uses `/api` for same-origin API calls. You only need to set this if you want to override the default behavior:
 
 ```bash
 VITE_API_URL=/api
 ```
 
-This tells the frontend to call `/api` instead of `http://localhost:3001/api`.
+**Default behavior:**
+- **Production**: Uses `/api` (same origin)
+- **Development**: Uses `http://localhost:3001/api` (separate servers)
 
 ### 3. Node Environment (Automatic)
 
@@ -135,11 +137,11 @@ Or use the Railway dashboard: https://railway.app
 
 ### 3. Configure Environment Variables
 
-In Railway dashboard, add:
+The only **required** environment variable is the database connection (automatically set by Railway MongoDB plugin).
 
-```bash
-VITE_API_URL=/api
-```
+**Optional variables** (usually not needed):
+- `VITE_API_URL=/api` - Only if you want to explicitly set it (auto-detected by default)
+- `PORT` - Railway sets this automatically
 
 ### 4. Deploy
 
