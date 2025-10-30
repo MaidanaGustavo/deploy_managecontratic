@@ -11,7 +11,7 @@
     "build:production": "npm install --omit=dev && npm run build:frontend",
     "build:frontend": "vite build",
     "build:backend": "next build",
-    "start": "serve -s public -l $PORT",
+    "start": "next start -p ${PORT:-3000}",
     "start:backend": "next start -p 3001",
     "lint": "eslint .",
     "preview": "vite preview",

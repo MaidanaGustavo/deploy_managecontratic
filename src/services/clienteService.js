@@ -1,6 +1,8 @@
 // Serviço para gerenciar clientes
 // Agora usando API Next.js como backend
 
+// In production (Railway), VITE_API_URL should be /api to use same-origin
+// In development, it defaults to http://localhost:3001/api
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
 // Serviço de clientes
